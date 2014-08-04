@@ -1,23 +1,17 @@
 package asciidocgo
 
 import (
-	"testing"
-	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestRenderer(t *testing.T) {
+var _ = Describe("Renderer", func() {
+	It("can be initialized", func() {
+		Expect(&Renderer{}).ToNot(BeNil())
+	})
 
-	Convey("A Renderer can be initialized", t, func() {
-		// TODO r := newRenderer()
-		Convey("By default, an Renderer can be created", func() {
-			So(&Renderer{}, ShouldNotBeNil)
-			// TODO So(r, ShouldNotBeNil)
-		})
+	It("can render a template", func() {
+		r := &Renderer{}
+		Expect(r.Render("", nil, nil)).To(Equal(""))
 	})
-	Convey("A Renderer can render a template", t, func() {
-		Convey("Empty template means empty result", func() {
-			r := &Renderer{}
-			So(r.Render("", nil, nil), ShouldEqual, "")
-		})
-	})
-}
+})
