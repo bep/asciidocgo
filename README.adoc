@@ -7,6 +7,22 @@ An Asciidoctor clone in Go. Very early stages.
 image:http://img.shields.io/travis/ciarand/asciidocgo.svg?style=flat[
     "Build status", link=https://travis-ci.org/ciarand/asciidocgo]
 
+Goals
+-----
+- Asciidoctor compatability
+
+- Blackfriday-like API (drop-in replacement ideally)
+
+- 100% test coverage
+
+Contributing
+------------
+- We mostly need documentation right now
+
+- Let's move everything to the root level
+
+- A CLI tool is almost literally the last thing we need to work on right now
+
 Code style
 ----------
 - Don't break the tests
@@ -23,6 +39,3 @@ Code style
 
 - Run the tests before (and after) you commit
 
-Contributing
-------------
-1. We mostly need documentation right now.
