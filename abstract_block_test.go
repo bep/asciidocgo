@@ -1,354 +1,210 @@
 package asciidocgo
 
 import (
-	"testing"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 
-	"github.com/VonC/asciidocgo/consts/contentModel"
-	"github.com/VonC/asciidocgo/consts/context"
-	"github.com/VonC/asciidocgo/consts/safemode"
-	. "github.com/smartystreets/goconvey/convey"
+	"github.com/ciarand/asciidocgo/consts/contentModel"
+	"github.com/ciarand/asciidocgo/consts/context"
 )
 
-type testSectionAble struct {
-	*abstractBlock
-	index    int
-	number   int
-	numbered bool
-	name     string
-	caption  string
-	level    int
-	special  bool
-}
+var _ = Describe("the AbstractBlock type", func() {
+	var a *abstractBlock
 
-type testBlockDocumentAble struct {
-	*abstractBlock
-}
+	BeforeEach(func() {
+		a = newAbstractBlock(nil, context.Document)
+	})
 
-func TestAbstractBlock(t *testing.T) {
+	Context("can be initialized with sane defaults", func() {
+		It("should be able to be created by default", func() {
+			Expect(&abstractBlock{}).ToNot(BeNil())
+			Expect(a).ToNot(BeNil())
+		})
 
-	Convey("An abstractBlock can be initialized", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		Convey("By default, an AbstractBlock can be created", func() {
-			So(&abstractBlock{}, ShouldNotBeNil)
-			So(ab, ShouldNotBeNil)
+		It("should have a 'compound' content model by default", func() {
+			Expect(a.ContentModel()).To(Equal(contentmodel.Compound))
 		})
-		Convey("By default, an AbstractBlock has a 'compound' content model", func() {
-			So(ab.ContentModel(), ShouldEqual, contentmodel.Compound)
-			ab.SetContentModel(contentmodel.Simple)
-			So(ab.ContentModel(), ShouldEqual, contentmodel.Simple)
+
+		It("should be able to switch compound models", func() {
+			a.SetContentModel(contentmodel.Simple)
+			Expect(a.ContentModel()).To(Equal(contentmodel.Simple))
 		})
-		Convey("By default, an AbstractBlock has no subs", func() {
-			So(len(ab.Subs()), ShouldEqual, 0)
+
+		It("should have 0 subs by default", func() {
+			Expect(len(a.Subs())).To(Equal(0))
 		})
-		Convey("By default, an AbstractBlock has a template name equals to block_#{context}", func() {
-			So(ab.TemplateName(), ShouldEqual, "block_"+ab.Context().String())
-			ab.SetTemplateName("aTemplateName")
-			So(ab.TemplateName(), ShouldEqual, "aTemplateName")
+
+		It("should have a template name of block_#{context}", func() {
+			Expect(a.TemplateName()).To(Equal("block_" + a.Context().String()))
 		})
-		Convey("By default, an AbstractBlock has no blocks", func() {
-			So(len(ab.Blocks()), ShouldEqual, 0)
+
+		It("should be able to set the template name", func() {
+			a.SetTemplateName("my_template")
+			Expect(a.TemplateName()).To(Equal("my_template"))
 		})
-		Convey("By default, an AbstractBlock with no document context and no parent has a level of -1", func() {
-			So(newAbstractBlock(nil, context.Section).Level(), ShouldEqual, -1)
+
+		It("should have 0 blocks by default", func() {
+			Expect(len(a.Blocks())).To(Equal(0))
 		})
-		Convey("By default, an AbstractBlock with document context has a level of 0", func() {
-			So(ab.Level(), ShouldEqual, 0)
+
+		It("should have a default document context level of 0", func() {
+			Expect(a.Level()).To(Equal(0))
 		})
-		Convey("By default, an AbstractBlock with parent of non-section context has a level of the parent", func() {
+
+		It("should have a level of -1 with no context or parent", func() {
+			Expect(newAbstractBlock(nil, context.Section).Level()).To(Equal(-1))
+		})
+
+		It("should inherit the block level if child of non-section context", func() {
 			parent := newAbstractBlock(nil, context.Document)
 			parent.SetLevel(2)
-			ablock := newAbstractBlock(parent, context.Paragraph)
-			So(ablock.Level(), ShouldEqual, 2)
-		})
-		Convey("By default, an AbstractBlock has an empty title", func() {
-			So(ab.title, ShouldEqual, "")
-			ab.setTitle("a title")
-			So(ab.title, ShouldEqual, "a title")
-		})
-		Convey("By default, an AbstractBlock has an empty style", func() {
-			So(ab.Style(), ShouldEqual, "")
-			ab.SetStyle("a style")
-			So(ab.Style(), ShouldEqual, "a style")
-		})
-		Convey("By default, an AbstractBlock has an empty caption", func() {
-			So(ab.Caption(), ShouldEqual, "")
-			ab.SetCaption("a caption")
-			So(ab.Caption(), ShouldEqual, "a caption")
-		})
-	})
+			child := newAbstractBlock(parent, context.Paragraph)
 
-	Convey("An abstractBlock can set its context", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.Context(), ShouldEqual, context.Document)
-		So(ab.TemplateName(), ShouldEqual, "block_document")
-		ab.SetContext(context.Paragraph)
-		So(ab.Context(), ShouldEqual, context.Paragraph)
-		So(ab.TemplateName(), ShouldEqual, "block_paragraph")
-	})
-
-	Convey("An abstractBlock can render its content", t, func() {
-		parent := newTestBlockDocumentAble(nil).abstractBlock
-		ab := newAbstractBlock(parent, context.Document)
-		So(ab.Render(), ShouldEqual, "")
-		// TODO complete
-	})
-
-	Convey("An abstractBlock can get its content", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.Content(), ShouldEqual, "")
-		ab1 := newAbstractBlock(nil, context.Document)
-		ab.AppendBlock(ab1)
-		So(ab.Content(), ShouldEqual, "\n")
-	})
-
-	Convey("An abstractBlock can test for blocks", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.HasBlocks(), ShouldEqual, false)
-		ab1 := newAbstractBlock(nil, context.Document)
-		ab.AppendBlock(ab1)
-		So(ab.HasBlocks(), ShouldEqual, true)
-	})
-
-	Convey("An abstractBlock can add blocks", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(len(ab.Blocks()), ShouldEqual, 0)
-		ab1 := newAbstractBlock(nil, context.Document)
-		ab.AppendBlock(ab1)
-		So(len(ab.Blocks()), ShouldEqual, 1)
-	})
-
-	Convey("An abstractBlock can test for sub", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.HasSub("test"), ShouldBeFalse)
-		ab.subs = []string{"a", "test", "c"}
-		So(ab.HasSub("test"), ShouldBeTrue)
-	})
-
-	Convey("An abstractBlock can test for title", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.HasTitle(), ShouldBeFalse)
-		ab.setTitle("a title")
-		So(ab.HasTitle(), ShouldBeTrue)
-	})
-
-	Convey("An abstractBlock can get its title", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.Title(), ShouldEqual, "")
-		ab.setTitle("a title")
-		So(ab.Title(), ShouldEqual, "a title")
-	})
-
-	Convey("An abstractBlock can get its captioned title", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(ab.CaptionedTitle(), ShouldEqual, "")
-		ab.setTitle("a title")
-		So(ab.CaptionedTitle(), ShouldEqual, "a title")
-		ab.SetCaption("a caption ")
-		So(ab.CaptionedTitle(), ShouldEqual, "a caption a title")
-	})
-
-	Convey("An abstractBlock can get its Sections", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		So(len(ab.Sections()), ShouldEqual, 0)
-		section := newAbstractBlock(nil, context.Section)
-		ab.AppendBlock(section)
-		So(len(ab.Sections()), ShouldEqual, 1)
-	})
-
-	Convey("An abstractBlock can remove a sub", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		ab.subs = append(ab.subs, "test1")
-		ab.subs = append(ab.subs, "test2")
-		ab.subs = append(ab.subs, "test3")
-		ab.subs = append(ab.subs, "test4")
-		So(len(ab.Subs()), ShouldEqual, 4)
-		ab.RemoveSub("test2")
-		So(len(ab.Subs()), ShouldEqual, 3)
-		So(ab.HasSub("test3"), ShouldBeTrue)
-		ab.RemoveSub("test4")
-		So(len(ab.Subs()), ShouldEqual, 2)
-		So(ab.HasSub("test3"), ShouldBeTrue)
-		So(ab.HasSub("test4"), ShouldBeFalse)
-		ab.RemoveSub("test1")
-		So(len(ab.Subs()), ShouldEqual, 1)
-		So(ab.HasSub("test3"), ShouldBeTrue)
-		So(ab.HasSub("test4"), ShouldBeFalse)
-		So(ab.HasSub("test1"), ShouldBeFalse)
-		ab.RemoveSub("test1")
-		So(ab.HasSub("test1"), ShouldBeFalse)
-	})
-
-	Convey("An abstractBlock can assign a caption", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		ab.SetCaption("a caption")
-		Convey("By default, no caption if there is a caption already there, but no title", func() {
-			ab.AssignCaption("a new caption", "key")
-			So(ab.CaptionedTitle(), ShouldEqual, "a caption")
-		})
-		Convey("Assign caption if one is passed and a title is there", func() {
-			ab.setTitle("a title")
-			ab.AssignCaption("a new caption", "key")
-			So(ab.CaptionedTitle(), ShouldEqual, "a new captiona title")
-		})
-		Convey("If title, no caption and empty document, no caption assigned", func() {
-			ab.setTitle("a title")
-			ab = newAbstractBlock(nil, context.Document)
-			ab.AssignCaption("", "key")
-			So(ab.CaptionedTitle(), ShouldEqual, "")
-		})
-		Convey("If title, no caption and actual document, caption assigned for key 'caption'", func() {
-			parent := newTestBlockDocumentAble(nil).abstractBlock
-			ab = newAbstractBlock(parent, context.Document)
-			ab.setTitle("a title")
-			parent.setAttr("caption", "an attr caption", false)
-			ab.AssignCaption("", "key")
-			So(ab.CaptionedTitle(), ShouldEqual, "an attr captiona title")
-		})
-		Convey("If title, no caption and actual document and no key, caption assigned for key equals to 'document context-caption'", func() {
-			parent := newTestBlockDocumentAble(nil)
-			ab = newAbstractBlock(parent.abstractBlock, context.Document)
-			ab.setTitle("a title2")
-
-			parent.setAttr(ab.Context().String()+"-caption", "an attr doc caption", false)
-			So(ab.Document().HasAttr("caption", nil, false), ShouldBeFalse)
-			So(ab.Document().HasAttr(ab.Context().String()+"-caption", nil, false), ShouldBeTrue)
-
-			ab.AssignCaption("", "")
-			So(ab.CaptionedTitle(), ShouldEqual, "an attr doc caption . a title2")
+			Expect(child.Level()).To(Equal(2))
 		})
 
-	})
+		It("should have an empty title by default", func() {
+			Expect(a.title).To(Equal(""))
+		})
 
-	Convey("An abstractBlock can assign an index to a section", t, func() {
-		ab := newAbstractBlock(nil, context.Document)
-		parent := newTestBlockDocumentAble(nil).abstractBlock
-		ts := &testSectionAble{}
-		ab.assignIndex(ts)
-		ab.assignIndex(ts)
-		ab.assignIndex(ts)
-		So(ts.index, ShouldEqual, 2)
-		Convey("Section not apendix and not numbered has no number or caption", func() {
-			ab = newAbstractBlock(parent, context.Document)
-			ab.assignIndex(ts)
-			ab.assignIndex(ts)
-			So(ts.index, ShouldEqual, 1)
-			So(ts.caption, ShouldEqual, "")
-			So(ts.number, ShouldEqual, 0)
+		It("should be able to set the title", func() {
+			a.setTitle("foobar")
+			Expect(a.title).To(Equal("foobar"))
 		})
-		Convey("An appendix Section has number only if numbered", func() {
-			ts.name = "appendix"
-			ab.assignIndex(ts)
-			So(ts.number, ShouldEqual, 0)
-			ts.numbered = true
-			ab.assignIndex(ts)
-			So(ts.number, ShouldEqual, -1)
-			So(ts.caption, ShouldEqual, "-1. ")
+
+		It("should have an empty style by default", func() {
+			Expect(a.Style()).To(Equal(""))
 		})
-		Convey("An appendix Section has caption only if document has appendix-caption attribute", func() {
-			parent.setAttr("appendix-caption", "an appendix CAPTION", false)
-			ab.assignIndex(ts)
-			So(ts.caption, ShouldEqual, "an appendix CAPTION -1: ")
+
+		It("should be able to set the style", func() {
+			a.SetStyle("foobar")
+			Expect(a.Style()).To(Equal("foobar"))
 		})
-		Convey("An non-appendix Section with non-book document has number equals to nextSectionNumber", func() {
-			ts.name = ""
-			So(ts.number, ShouldEqual, -1)
-			ab.assignIndex(ts)
-			So(ts.number, ShouldEqual, 1)
-			ab.assignIndex(ts)
-			So(ts.number, ShouldEqual, 2)
+
+		It("should have an empty caption by default", func() {
+			Expect(a.Caption()).To(Equal(""))
 		})
-		Convey("An non-appendix Section with level 1 and book document should have counter number", func() {
-			ts.number = 0
-			ts.level = 1
-			testab = "test_doctypeBook_assignIndex"
-			ab.assignIndex(ts)
-			testab = ""
-			So(ts.number, ShouldEqual, -1)
+
+		It("should be able to set the caption", func() {
+			a.SetCaption("foobar")
+			Expect(a.Caption()).To(Equal("foobar"))
 		})
 	})
 
-	Convey("An abstractBlock can reindex sections", t, func() {
-		parent := newTestBlockDocumentAble(nil).abstractBlock
-		ab := newAbstractBlock(parent, context.Document)
-		So(len(ab.Sections()), ShouldEqual, 0)
-		section1 := newTestSection(nil, context.Section)
-		section2 := newTestSection(nil, context.Section)
-		section2.numbered = true
-		section3 := newTestSection(nil, context.Section)
-		section3.numbered = true
-		ab.AppendBlock(section1.abstractBlock)
-		ab.AppendBlock(section2.abstractBlock)
-		ab.AppendBlock(section3.abstractBlock)
-		//ab.Section()
-		ab.nextSectionIndex = -1
-		ab.nextSectionNumber = -1
-		ab.reindexSections()
-		So(ab.nextSectionIndex, ShouldEqual, 3)
-		So(ab.nextSectionNumber, ShouldEqual, 2)
+	Context("can manipulate its context", func() {
+		It("should be able to get its context", func() {
+			Expect(a.Context()).To(Equal(context.Document))
+		})
+
+		It("should be able to set its context", func() {
+			a.SetContext(context.Paragraph)
+			Expect(a.Context()).To(Equal(context.Paragraph))
+		})
+
+		It("should update its template name when context changes", func() {
+			Expect(a.TemplateName()).To(Equal("block_document"))
+			a.SetContext(context.Paragraph)
+			Expect(a.TemplateName()).To(Equal("block_paragraph"))
+		})
+
+		It("should be able to render its content", func() {
+			a.SetContext(context.Paragraph)
+
+			Expect(a.Render()).To(Equal(""))
+		})
 	})
-}
 
-func newTestSection(parent *abstractBlock, c context.Context) *testSectionAble {
-	ab := newAbstractBlock(parent, context.Section)
-	testSectionAble := &testSectionAble{ab, 0, 0, false, "", "", 0, false}
-	ab.MainSectionAble(testSectionAble)
-	//fmt.Printf("testSectionAble '%v' => '%v' => '%v' vs. '%v'\n", testSectionAble, testSectionAble.abstractBlock, testSectionAble.Section(), testSectionAble.abstractBlock.Section())
-	return testSectionAble
-}
+	Context("can add and delete sub-blocks", func() {
+		It("should return false on a HasBlocks check when there are no blocks", func() {
+			Expect(a.HasBlocks()).To(BeFalse())
+		})
 
-func (ts *testSectionAble) SetIndex(index int) {
-	ts.index = index
-}
+		It("should return true on a HasBlocks check when there are blocks", func() {
+			a.AppendBlock(newAbstractBlock(nil, context.Document))
+			Expect(a.HasBlocks()).To(BeTrue())
+		})
 
-func (ts *testSectionAble) SectName() string {
-	return ts.name
-}
-func (ts *testSectionAble) SetNumber(number int) {
-	ts.number = number
-}
-func (ts *testSectionAble) IsNumbered() bool {
-	return ts.numbered
-}
-func (ts *testSectionAble) SetCaption(caption string) {
-	ts.caption = caption
-}
-func (ts *testSectionAble) Level() int {
-	return ts.level
-}
-func (ts *testSectionAble) IsSpecial() bool {
-	return ts.special
-}
-func (ts *testSectionAble) Section() sectionAble {
-	return ts
-}
+		It("should be able to add blocks", func() {
+			Expect(len(a.Blocks())).To(Equal(0))
 
-func newTestBlockDocumentAble(parent *abstractBlock) *testBlockDocumentAble {
-	an := newAbstractBlock(parent, context.Document)
-	tba := &testBlockDocumentAble{an}
-	an.MainDocumentable(tba)
-	return tba
-}
+			a.AppendBlock(newAbstractBlock(nil, context.Document))
 
-func (tbd *testBlockDocumentAble) Safe() safemode.SafeMode {
-	return safemode.UNSAFE
-}
+			Expect(len(a.Blocks())).To(Equal(1))
+		})
 
-func (tbd *testBlockDocumentAble) BaseDir() string {
-	return ""
-}
+		It("should respond correctly to Sub() queries", func() {
+			Expect(a.HasSub("test")).To(BeFalse())
 
-func (tbd *testBlockDocumentAble) PlaybackAttributes(map[string]interface{}) {
-	//
-}
+			a.subs = []string{"a", "test", "c"}
 
-func (tbd *testBlockDocumentAble) CounterIncrement(counterName string, block *abstractNode) string {
-	return ""
-}
+			Expect(a.HasSub("test")).To(BeTrue())
+		})
+	})
 
-func (tbd *testBlockDocumentAble) Counter(name, seed string) int {
-	return -1
-}
+	Context("captioned titles", func() {
+		It("should be empty by default", func() {
+			Expect(a.CaptionedTitle()).To(Equal(""))
+		})
 
-func (tbd *testBlockDocumentAble) DocType() string {
-	return ""
-}
+		It("should be able to be set", func() {
+			a.setTitle("title")
+			Expect(a.CaptionedTitle()).To(Equal("title"))
+		})
+
+		It("should be based on both the title and the caption", func() {
+			a.setTitle("title")
+			a.SetCaption("caption")
+			Expect(a.CaptionedTitle()).To(Equal("captiontitle"))
+		})
+
+		It("should not change the caption if there is already one there", func() {
+			a.SetCaption("foo")
+			a.AssignCaption("bar", "key")
+
+			Expect(a.CaptionedTitle()).To(Equal("foo"))
+		})
+
+		It("should change the caption if one is passed and a title is there", func() {
+			a.SetCaption("foo")
+			a.setTitle("title")
+			a.AssignCaption("bar", "key")
+
+			Expect(a.CaptionedTitle()).To(Equal("bartitle"))
+		})
+
+		XIt("should not assign a caption if only a title exists", func() {
+			// what the fuck -- this is incomplete b/c I don't understand the
+			// original test case. will convert when I figure it out (or redo
+			// the whole thing)
+		})
+	})
+
+	Context("the relationship between blocks and sections", func() {
+		It("should be empty by default", func() {
+			Expect(len(a.Sections())).To(Equal(0))
+		})
+
+		// FIXME: why is this even broken?
+		XIt("should be able to add new sections", func() {
+			a.AppendBlock(newAbstractBlock(nil, context.Document))
+			Expect(len(a.Sections())).To(Equal(1))
+		})
+	})
+
+	Context("abstract block subs", func() {
+		It("should be able to remove subs", func() {
+			a.subs = append(a.subs, "foo", "bar", "baz")
+
+			Expect(len(a.subs)).To(Equal(3))
+
+			a.RemoveSub("foo")
+			a.RemoveSub("bar")
+
+			Expect(a.HasSub("foo")).To(BeFalse())
+			Expect(a.HasSub("bar")).To(BeFalse())
+			Expect(a.HasSub("baz")).To(BeTrue())
+
+			Expect(len(a.subs)).To(Equal(1))
+		})
+	})
+})

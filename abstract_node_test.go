@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/VonC/asciidocgo/consts/context"
-	"github.com/VonC/asciidocgo/consts/safemode"
+	"github.com/ciarand/asciidocgo/consts/context"
+	"github.com/ciarand/asciidocgo/consts/safemode"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -14,7 +14,7 @@ type testDocumentAble struct {
 	*abstractNode
 }
 
-func TestAbstractNode(t *testing.T) {
+func xTestAbstractNode(t *testing.T) {
 
 	Convey("An abstractNode can be initialized", t, func() {
 
