@@ -1,6 +1,25 @@
 asciidocgo
 ==========
 
-Like [github.com/asciidoctor/asciidoctor](https://github.com/asciidoctor/asciidoctor), but in Go 1.2.  
-(With a *lot of* unit tests)  
-(And 100% code coverage as a result)
+[quote]
+An Asciidoctor clone in Go. Very early stages.
+
+Code style
+----------
+- Don't break the tests
+
+- Format with gofmt
+
+- Use Ginkgo for tests
+
+- Comment every new function or struct you add
+
+- Never use `panic` in reachable code
+
+- Use `snake_case` for filenames, camel case for symbols
+
+- Run the tests before (and after) you commit
+
+Contributing
+------------
+1. We mostly need documentation right now.
