@@ -4,8 +4,8 @@ asciidocgo
 [quote]
 An Asciidoctor clone in Go. Very early stages.
 
-image:http://img.shields.io/travis/ciarand/asciidocgo.svg?style=flat[
-    "Build status", link=https://travis-ci.org/ciarand/asciidocgo]
+image:http://img.shields.io/travis/bjornerik/asciidocgo.svg?style=flat[
+    "Build status", link=https://travis-ci.org/bjornerik/asciidocgo]
 
 Goals
 -----
