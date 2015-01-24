@@ -1,8 +1,8 @@
 package quotes
 
 import (
-	"testing"
 	. "github.com/smartystreets/goconvey/convey"
+	"testing"
 )
 
 func TestQuotes(t *testing.T) {
@@ -81,7 +81,7 @@ func TestQuotes(t *testing.T) {
 			So(reres.Attribute(), ShouldEqual, "")
 			So(reres.Quote(), ShouldEqual, "a few strong words")
 		})
-		Convey("single-line constrained strong string", func() {
+		Convey("single-line constrained strong string2", func() {
 			reres := NewQuoteSubRxres(`*a few strong failed words*a`, qs)
 			So(reres.HasAnyMatch(), ShouldBeFalse)
 			So(reres.PrefixQuote(), ShouldEqual, "")
