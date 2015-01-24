@@ -3,8 +3,8 @@ package asciidocgo
 import (
 	"strconv"
 
-	"github.com/ciarand/asciidocgo/consts/contentModel"
-	"github.com/ciarand/asciidocgo/consts/context"
+	"github.com/bjornerik/asciidocgo/consts/contentModel"
+	"github.com/bjornerik/asciidocgo/consts/context"
 )
 
 /* An abstract class that provides state and methods for managing

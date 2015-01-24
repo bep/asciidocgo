@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ciarand/asciidocgo/consts/regexps"
+	"github.com/bjornerik/asciidocgo/consts/regexps"
 )
 
 var testpr = ""

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/ciarand/asciidocgo/consts/context"
-	"github.com/ciarand/asciidocgo/consts/regexps"
-	"github.com/ciarand/asciidocgo/consts/safemode"
+	"github.com/bjornerik/asciidocgo/consts/context"
+	"github.com/bjornerik/asciidocgo/consts/regexps"
+	"github.com/bjornerik/asciidocgo/consts/safemode"
 )
 
 var testan = ""

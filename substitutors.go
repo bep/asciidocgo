@@ -9,11 +9,11 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/ciarand/asciidocgo/consts/compliance"
-	"github.com/ciarand/asciidocgo/consts/context"
-	"github.com/ciarand/asciidocgo/consts/regexps"
-	"github.com/ciarand/asciidocgo/consts/regexps/quotes"
-	"github.com/ciarand/asciidocgo/debug"
+	"github.com/bjornerik/asciidocgo/consts/compliance"
+	"github.com/bjornerik/asciidocgo/consts/context"
+	"github.com/bjornerik/asciidocgo/consts/regexps"
+	"github.com/bjornerik/asciidocgo/consts/regexps/quotes"
+	"github.com/bjornerik/asciidocgo/debug"
 )
 
 type _sub string

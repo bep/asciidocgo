@@ -4,8 +4,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/ciarand/asciidocgo/consts/contentModel"
-	"github.com/ciarand/asciidocgo/consts/context"
+	"github.com/bjornerik/asciidocgo/consts/contentModel"
+	"github.com/bjornerik/asciidocgo/consts/context"
 )
 
 var _ = Describe("the AbstractBlock type", func() {
