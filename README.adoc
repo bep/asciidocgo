@@ -1,7 +1,7 @@
 asciidocgo
 ==========
 
-An Asciidoctor clone in Go. Very early stages.
+An Asciidoctor clone in Go. **Very early stages.**
 
 image:http://img.shields.io/travis/bjornerik/asciidocgo.svg?style=flat[
     "Build status", link=https://travis-ci.org/bjornerik/asciidocgo]
@@ -20,11 +20,8 @@ Goals
 
 Contributing
 ------------
-- We mostly need documentation right now
+- Help from experienced Gophers appreciated!
 
-- Let's move everything to the root level
-
-- A CLI tool is almost literally the last thing we need to work on right now
 
 Code style
 ----------
