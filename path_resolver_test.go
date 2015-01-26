@@ -1,9 +1,9 @@
 package asciidocgo
 
 import (
-	"os"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 )
 
 var _ = Describe("the path_resolver module", func() {
@@ -48,36 +48,6 @@ var _ = Describe("the path_resolver module", func() {
 
 		It("should be replace backslashes with slashes", func() {
 			Expect(Posixfy((`a\b\c`))).To(Equal("a/b/c"))
-		})
-	})
-
-	Context("root check", func() {
-		// not really sure what this is intended to do, as it's a useless
-		// wrapper over the path pkg's isAbs (which doesn't do anything funny
-		// with Windows paths)?
-		XIt("should return true for root paths on Windows", func() {
-			Expect(IsRoot(`C:\`)).To(BeTrue())
-			Expect(IsRoot(`C:/`)).To(BeTrue())
-			Expect(IsRoot(`C:\a/b/`)).To(BeTrue())
-			Expect(IsRoot(`C:/a/b/../c`)).To(BeTrue())
-			Expect(IsRoot(`C:\a/b/../c`)).To(BeTrue())
-		})
-
-		It("should return false for relative paths on Windows", func() {
-			Expect(IsRoot(`a\b\c\`)).To(BeFalse())
-			Expect(IsRoot(`..\a\b\c`)).To(BeFalse())
-		})
-
-		It("should return true for root paths on a Unixy OS", func() {
-			Expect(IsRoot(`/`)).To(BeTrue())
-			Expect(IsRoot(`/foo/bar/baz`)).To(BeTrue())
-			Expect(IsRoot(`/bar/../foo/baz`)).To(BeTrue())
-		})
-
-		It("should return false for relative paths on a Unixy OS", func() {
-			Expect(IsRoot(`test`)).To(BeFalse())
-			Expect(IsRoot(`a/b/c`)).To(BeFalse())
-			Expect(IsRoot(`../a/../b/c`)).To(BeFalse())
 		})
 	})
 

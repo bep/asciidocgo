@@ -160,14 +160,6 @@ func NewPathResolver(fileSeparator byte, workingDir string) *PathResolver {
 	return &PathResolver{fileSeparator, workingDir}
 }
 
-/*Check if the specified path is an absolute root path
-his operation correctly handles both posix and windows paths.
-returns a Boolean indicating whether the path is an absolute root path
-*/
-func IsRoot(apath string) bool {
-	return filepath.IsAbs(apath)
-}
-
 /*Determine if the path is an absolute (root) web path.
 Returns a Boolean indicating whether the path is an absolute (root) web path*/
 func IsWebRoot(apath string) bool {
@@ -206,11 +198,11 @@ func PartitionPath(path string, webPath bool) (pathSegments []string, root strin
 	isRoot := false
 	if webPath {
 		isRoot = IsWebRoot(posixPath)
-		if !isRoot && IsRoot(posixPath) {
+		if !isRoot && filepath.IsAbs(posixPath) {
 			panic(fmt.Sprintf("path '%v' is a root path, but not a web root path", path))
 		}
 	} else {
-		isRoot = IsRoot(posixPath)
+		isRoot = filepath.IsAbs(posixPath)
 		if !isRoot && IsWebRoot(posixPath) {
 			panic(fmt.Sprintf("path '%v' is a root path, but not a windows root path", path))
 		}
@@ -292,7 +284,7 @@ any parent references resolved and self references removed and enforces
 that the resolved path be contained within the jail, if provided
 */
 func (pr *PathResolver) SystemPath(target, start, jail string, canrecover bool, targetName string) string {
-	if jail != "" && !IsRoot(jail) {
+	if jail != "" && !filepath.IsAbs(jail) {
 		panic(fmt.Sprintf("Jail is not an absolute path: %v", jail))
 	}
 	jail = Posixfy(jail)
@@ -302,7 +294,7 @@ func (pr *PathResolver) SystemPath(target, start, jail string, canrecover bool, 
 			if jail == "" {
 				return Posixfy(pr.WorkingDir())
 			}
-		} else if IsRoot(start) {
+		} else if filepath.IsAbs(start) {
 			if jail == "" {
 				return ExpandPath(start)
 			}
@@ -326,7 +318,7 @@ func (pr *PathResolver) SystemPath(target, start, jail string, canrecover bool, 
 		} else {
 			start = jail
 		}
-	} else if IsRoot(start) {
+	} else if filepath.IsAbs(start) {
 		start = Posixfy(start)
 	} else {
 		start = pr.SystemPath(start, jail, jail, true, targetName)
@@ -465,7 +457,7 @@ Return the relative path String of the filename calculated
 from the base directory
 */
 func (pr *PathResolver) RelativePath(filename, baseDirectory string) string {
-	if IsRoot(filename) && IsRoot(baseDirectory) {
+	if filepath.IsAbs(filename) && filepath.IsAbs(baseDirectory) {
 		offset := baseDirectory
 		if strings.HasSuffix(baseDirectory, string(pr.FileSeparator())) {
 			offset = baseDirectory[:len(baseDirectory)-1]
