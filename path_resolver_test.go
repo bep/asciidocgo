@@ -4,6 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"os"
+	"path/filepath"
 )
 
 var _ = Describe("the path_resolver module", func() {
@@ -22,7 +23,7 @@ var _ = Describe("the path_resolver module", func() {
 			pwd, _ := os.Getwd()
 
 			Expect(NewPathResolver(0, "").WorkingDir()).To(Equal(pwd))
-			Expect(NewPathResolver(0, `/`).WorkingDir()).To(Equal(`/`))
+			Expect(NewPathResolver(0, filepath.FromSlash("/")).WorkingDir()).To(Equal(filepath.FromSlash("/")))
 			Expect(NewPathResolver(0, "test").WorkingDir()).To(Equal(pwd + string(os.PathSeparator) + "test"))
 		})
 	})
