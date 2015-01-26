@@ -1,0 +1,17 @@
+version: "{build}"
+os: Windows Server 2012 R2
+clone_folder: C:\GOPATH\src\github.com\bjornerik\asciidocgo
+environment:
+GOPATH: c:\GOPATH
+install:
+- set PATH=%GOPATH%\bin;%PATH%
+- cd %APPVEYOR_BUILD_FOLDER%
+- go version
+- go get -v github.com/onsi/ginkgo/ginkgo
+- go get -v github.com/onsi/gomega
+- go get -v golang.org/x/tools/cmd/cover; fi
+- go get -v -t ./...
+build_script:
+- ginkgo -r --randomizeAllSpecs --randomizeSuites --cover --trace --race
+test: off
+deploy: off
