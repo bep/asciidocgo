@@ -1,11 +1,14 @@
 asciidocgo
 ==========
 
-[quote]
 An Asciidoctor clone in Go. Very early stages.
 
 image:http://img.shields.io/travis/bjornerik/asciidocgo.svg?style=flat[
     "Build status", link=https://travis-ci.org/bjornerik/asciidocgo]
+
+image:https://ci.appveyor.com/api/projects/status/l6l820f9u1ekxhh5/branch/master?svg=true[
+    "Build status", link=https://ci.appveyor.com/project/bjornerik/asciidocgo/branch/master]
+
 
 Goals
 -----
